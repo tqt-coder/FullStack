@@ -3,7 +3,7 @@
   <a class="navbar-brand" href="#">Manager Employee</a>
   <ul class="navbar-nav mr-auto">
     <li class="nav-item">
-      <a class="nav-link" href="#" data-toggle="modal" data-target="#addEmployee">Add employee</a>
+      <a class="nav-link" href="#" (click)="onOpenModal( null,'add' )">Add employee</a>
     </li>
     <li class="nav-item">
       <!-- <a class="nav-link" href="#"></a> -->
@@ -17,10 +17,10 @@
     </form>
   </ul>
 </nav>
-<div class="container">
+<div class="container" id="main-container">
 
   <div class="row">
-    <div class="col-md-6 col-xl-3" *ngFor="let employee of employees">
+    <div class="col-md-6 col-xl-3" *ngFor="let employee of employees" >
       <div class="card m-b-30">
         <div class="card-body row">
           <div class="col-6">
@@ -38,9 +38,9 @@
         </ul>
         <div class="card-body">
           <div class="float-right btn-group btn-group-sm">
-            <a href="#" data-toggle="modal" data-target="#editEmployee" class="btn btn-primary tooltips"
-              data-placement="top" data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
-            <a href="#" data-toggle="modal" data-target="#deleteEmployee" class="btn btn-secondary tooltips"
+            <a href="#" (click)="onOpenModal( employee,'edit' )" class="btn btn-primary tooltips" data-placement="top"
+              data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
+            <a href="#" (click)="onOpenModal( employee,'delete' )" class="btn btn-secondary tooltips"
               data-placement="top" data-original-title="Delete"><i class="fa fa-times"></i></a>
           </div>
           <ul class="social-links list-inline mb-0">
@@ -167,7 +167,7 @@
 <div class="modal fade" id="deleteEmployee" tabindex="-1" role="dialog" aria-labelledby="deleteEmployee"
   aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <div class="modal-content">
+    <form #deleteForm="ngForm" (ngSubmit)="onDeleteEmployee(deleteForm.value)" class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deleteEmployee">Delete</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -177,11 +177,13 @@
       <div class="modal-body">
         Are delete employee?
       </div>
+      <input type="text" name="id" ngModel="{{editEmployee?.id}}">
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" id="btn-close-delete" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save
+          changes</button>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 
@@ -195,33 +197,47 @@
         </button>
       </div>
       <div class="modal-body">
-        <form>
+        <form #editForm="ngForm" (ngSubmit)="onUpdateEmployee(editForm.value)">
           <div class="form-icon">
             <span><i class="icon icon-user"></i></span>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="username" placeholder="Username">
+            <input type="text" hidden ngModel="{{editEmployee?.id}}" name="id" class="form-control item"
+              placeholder="Username">
+
+            <input type="text" hidden ngModel="{{editEmployee?.employeeCode}}" name="employeeCode"
+              class="form-control item" placeholder="Username">
           </div>
           <div class="form-group">
-            <input type="password" class="form-control item" id="phone" placeholder="phone">
+            <input type="text" ngModel="{{editEmployee?.name}}" required name="name" class="form-control item"
+              placeholder="Username">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="email" placeholder="Email">
+            <input type="text" ngModel="{{editEmployee?.phone}}" required name="phone" class="form-control item"
+              placeholder="phone">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="My job" placeholder="My job">
+            <input type="email" ngModel="{{editEmployee?.email}}" required name="email" class="form-control item"
+              placeholder="Email">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="ImagUrl" placeholder="ImagUrl">
+            <input type="text" ngModel="{{editEmployee?.jobTitle}}" required name="jobTitle" class="form-control item"
+              placeholder="My job">
           </div>
           <div class="form-group">
-            <button type="button" class="btn btn-block bg-success create-account">Save</button>
+            <input type="text" ngModel="{{editEmployee?.imageUrl}}" name="imageUrl" class="form-control item"
+              placeholder="ImagUrl">
+          </div>
+          <!-- <div class="form-group">
+            <button type="button" (ngSubmit)="onUpdateEmployee(editForm.value)" [disabled]="editForm.invalid"
+              class="btn btn-block bg-success create-account">Save</button>
+          </div> -->
+
+          <div class="modal-footer">
+            <button type="button" id="hidden-edit" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" [disabled]="editForm.invalid" class="btn btn-primary">Save changes</button>
           </div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
@@ -238,34 +254,37 @@
       </div>
       <div class="modal-body">
 
-        <form>
+        <form #addForm="ngForm" (ngSubmit)="onAddEmployee(addForm)">
           <div class="form-icon">
             <span><i class="icon icon-user"></i></span>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="username" placeholder="Username">
+            <input type="text" ngModel name="name" required class="form-control item" id="username"
+              placeholder="Username">
           </div>
           <div class="form-group">
-            <input type="password" class="form-control item" id="phone" placeholder="phone">
+            <input type="text" ngModel name="phone" required class="form-control item" id="phone" placeholder="phone">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="email" placeholder="Email">
+            <input type="text" ngModel name="email" required class="form-control item" id="email" placeholder="Email">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="My job" placeholder="My job">
+            <input type="text" ngModel name="jobTitle" required class="form-control item" id="My job"
+              placeholder="My job">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control item" id="ImagUrl" placeholder="ImagUrl">
+            <input type="text" ngModel name="imageUrl" required class="form-control item" id="ImagUrl"
+              placeholder="ImagUrl">
           </div>
           <div class="form-group">
-            <button type="button" class="btn btn-block bg-success create-account">Create</button>
+            <button type="button" type="submit" class="btn btn-block bg-success create-account">Create</button>
           </div>
         </form>
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" id="add-employee-form" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" [disabled]="addForm.invalid" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
